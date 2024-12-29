@@ -11,23 +11,84 @@
       </div>
       
       <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-      
       <script>
         const ctx = document.getElementById('myChart');
         
         const getData = async () => {
             const response = await fetch("http://localhost:9999/getlogs");
             const data = await response.json();
-            console.log(data);
-            return data;
+            return data.logs;
         }
 
-        getData();
-              
+
+        
+        const showData = async () => {
+            const data = await getData();
+            
+            for (let i = 0; i < data.length; i++) {
+                console.log(data[i].time);
+            }
+        }
+
+        showData();
+
+        const array = [];
+
+        const now = new Date();
+
+        // Array to store the dates
+
+        const dateInDays = () => {
+            const dates = [];
+
+            for (let i = 0; i <= 30; i += 5) {
+                const pastDate = new Date();
+                pastDate.setDate(now.getDate() - i);
+            
+                // Format the date to 'YYYY-MM-DD'
+                const formattedDate = pastDate.getFullYear() + '-' + 
+                                      (pastDate.getMonth() + 1).toString().padStart(2, '0') + '-' + 
+                                      pastDate.getDate().toString().padStart(2, '0');
+            
+                dates.push(formattedDate);
+            }
+            dates.reverse();
+
+            return dates;
+        }
+        
+        // 12 / 2 --> 12 hrs
+        // 6 / 1 --> 6 hrs
+
+        const dateInHours = (hr, split) => {
+            const now = new Date();
+            const dates = [];
+
+            for (let i = 0; i <= hr; i += split) {
+                const pastDate = new Date();
+                pastDate.setHours(now.getHours() - i);
+
+                // Get hours, minutes, and determine AM/PM
+                let hours = pastDate.getHours();
+                const minutes = pastDate.getMinutes().toString().padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12 || 12; // Convert to 12-hour format, ensuring 12 instead of 0
+
+                // Format the date as 'HH:MM AM/PM'
+                const formattedDate = hours.toString().padStart(2, '0') + ':' + minutes + ' ' + ampm;
+
+                dates.push(formattedDate);
+            }
+            dates.reverse();
+
+            return dates;
+        };
+        
+
         new Chart(ctx, {
-          type: 'bar',
+          type: 'line',
           data: {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            labels: dateInHours(12, 2),
             datasets: [{
               label: '# of Votes',
               data: [12, 19, 3, 5, 2, 3],
