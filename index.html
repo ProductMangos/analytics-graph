@@ -14,7 +14,16 @@
       
       <script>
         const ctx = document.getElementById('myChart');
-      
+        
+        const getData = async () => {
+            const response = await fetch("http://localhost:9999/getlogs");
+            const data = await response.json();
+            console.log(data);
+            return data;
+        }
+
+        getData();
+              
         new Chart(ctx, {
           type: 'bar',
           data: {
